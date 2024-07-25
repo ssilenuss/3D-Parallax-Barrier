@@ -1,0 +1,95 @@
+[gd_scene load_steps=12 format=3 uid="uid://nxneb51ofs2m"]
+
+[ext_resource type="Script" path="res://GenerateSpinningCubes.gd" id="1_7mpj7"]
+[ext_resource type="Script" path="res://CameraController.gd" id="1_i7kw4"]
+[ext_resource type="Shader" path="res://3D-Glasses.gdshader" id="3_lcva6"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3fwdm"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_q332l"]
+material = SubResource("StandardMaterial3D_3fwdm")
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_qbrf4"]
+
+[sub_resource type="Sky" id="Sky_acn38"]
+sky_material = SubResource("ProceduralSkyMaterial_qbrf4")
+
+[sub_resource type="Environment" id="Environment_7mx7h"]
+background_mode = 2
+sky = SubResource("Sky_acn38")
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_64tey"]
+viewport_path = NodePath("3D_World/StereoCameraRig/Viewport-L")
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_886yu"]
+viewport_path = NodePath("3D_World/StereoCameraRig/Viewport-R")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_xdn3p"]
+resource_local_to_scene = true
+shader = ExtResource("3_lcva6")
+shader_parameter/left_color = Color(1, 0, 0, 1)
+shader_parameter/right_color = Color(0, 1, 1, 1)
+shader_parameter/left_eye = SubResource("ViewportTexture_64tey")
+shader_parameter/right_eye = SubResource("ViewportTexture_886yu")
+
+[node name="Main" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_i7kw4")
+eye_seperation = 0.16
+
+[node name="3D_World" type="Node3D" parent="."]
+
+[node name="Cubes" type="Node3D" parent="3D_World"]
+script = ExtResource("1_7mpj7")
+
+[node name="Cube" type="MeshInstance3D" parent="3D_World/Cubes"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -5)
+mesh = SubResource("BoxMesh_q332l")
+
+[node name="StereoCameraRig" type="Node3D" parent="3D_World"]
+unique_name_in_owner = true
+
+[node name="Viewport-L" type="SubViewport" parent="3D_World/StereoCameraRig"]
+
+[node name="OuterGimbal_L" type="Node3D" parent="3D_World/StereoCameraRig/Viewport-L"]
+unique_name_in_owner = true
+
+[node name="InnerGimbal_L" type="Node3D" parent="3D_World/StereoCameraRig/Viewport-L/OuterGimbal_L"]
+unique_name_in_owner = true
+
+[node name="Camera_L" type="Camera3D" parent="3D_World/StereoCameraRig/Viewport-L/OuterGimbal_L/InnerGimbal_L"]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.08, 0, 0)
+
+[node name="Viewport-R" type="SubViewport" parent="3D_World/StereoCameraRig"]
+render_target_update_mode = 4
+
+[node name="OuterGimbal_R" type="Node3D" parent="3D_World/StereoCameraRig/Viewport-R"]
+unique_name_in_owner = true
+
+[node name="InnerGimbal_R" type="Node3D" parent="3D_World/StereoCameraRig/Viewport-R/OuterGimbal_R"]
+unique_name_in_owner = true
+
+[node name="Camera_R" type="Camera3D" parent="3D_World/StereoCameraRig/Viewport-R/OuterGimbal_R/InnerGimbal_R"]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.08, 0, 0)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="3D_World"]
+environment = SubResource("Environment_7mx7h")
+
+[node name="3D-Glasses" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_xdn3p")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.367499, 0.711021, -0.599495, -0.560261, 0.345255, 0.752932, 0.742329, 0.612576, 0.271476, 0, 0, 0)
